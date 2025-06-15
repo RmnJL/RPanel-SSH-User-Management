@@ -116,54 +116,10 @@ destination_directory="/var/www/"
   fi
 }
 wellcomeINSTALL() {
-  echo -e "${YELLOW}************ Select RPanel Version Nginx Web Server************"
-  echo -e "${GREEN}  1)RPanel v4.0 full free"
-  echo -e "${GREEN}  2)RPanel v3.9.9"
-  echo -e "${GREEN}  3)RPanel v3.9.7"
-  echo -e "${GREEN}  4)RPanel v3.9.6"
-  echo -e "${GREEN}  5)RPanel v3.9.4"
-  echo -e "${GREEN}  6)RPanel v3.9.1"
-  echo -e "${GREEN}  7)RPanel v3.8.7"
-  echo -e "${GREEN}  8)RPanel v3.8.6"
-  echo -e "${GREEN}  9)RPanel v3.8.5"
-  echo -e "${GREEN}  10)RPanel v3.7.9"
-  echo -ne "${GREEN}\nSelect Version : ${ENDCOLOR}"
-  read n
-  if [ "$n" != "" ]; then
-    if [ "$n" == "1" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v4-0
-    fi
-    if [ "$n" == "2" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-9-9
-    fi
-    if [ "$n" == "3" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-9-7
-    fi
-    if [ "$n" == "4" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-9-6
-    fi
-    if [ "$n" == "5" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-9-4
-    fi
-    if [ "$n" == "6" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-9-1
-    fi
-    if [ "$n" == "7" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-8-7
-    fi
-    if [ "$n" == "8" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-8-6
-    fi
-    if [ "$n" == "9" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-8-5
-    fi
-    if [ "$n" == "10" ]; then
-      linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v3-7-9
-    fi
-    
-  else
-    linkd=https://api.github.com/repos/xpanel-cp/XPanel-SSH-User-Management/releases/tags/v4-0
-  fi
+  echo -e "${YELLOW}************ RPanel Nginx Installer ************"
+  echo -e "${GREEN} نسخه فعلی: RPanel v4.0 (آخرین نسخه رسمی)"
+  linkd="https://github.com/RmnJL/RPanel-SSH-User-Management/releases/latest"
+  echo -e "\nلینک دریافت آخرین نسخه: $linkd"
 }
 userINPU() {
   echo -e "\nPlease input IP Server"
