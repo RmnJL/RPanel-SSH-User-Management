@@ -468,7 +468,7 @@ class ApiController extends Controller
         $this->checktoken($token);
         $date = date("Y-m-d---h-i-s");
         $ip_bk = str_replace(".", "-", $_SERVER["SERVER_ADDR"]);
-        Process::run("mysqldump -u '" .env('DB_USERNAME'). "' --password='" .env('DB_PASSWORD'). "' XPanel_plus > /var/www/html/app/storage/backup/".$ip_bk."-XPanel-".$date.".sql");
+        Process::run("mysqldump -u '" .env('DB_USERNAME'). "' --password='" .env('DB_PASSWORD'). "' RPanel_plus > /var/www/html/app/storage/backup/".$ip_bk."-RPanel-".$date.".sql");
         $download=$_SERVER["SERVER_ADDR"].':'.env('PORT_PANEL')."/api/$token/backup/dl/".$ip_bk."-XPanel-".$date.".sql";
 
         return response()->json(['message' => 'Backup Maked','link' => $download]);

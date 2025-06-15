@@ -448,7 +448,7 @@ class SettingsController extends Controller
         if (!is_string($name)) {
             abort(400, 'Not Valid Username');
         }
-        Process::run("mysql -u '" . env('DB_USERNAME') . "' --password='" . env('DB_PASSWORD') . "' XPanel_plus < /var/www/html/app/storage/backup/" . $name);
+        Process::run("mysql -u '" . env('DB_USERNAME') . "' --password='" . env('DB_PASSWORD') . "' RPanel_plus < /var/www/html/app/storage/backup/" . $name);
         $users = Users::where('status', 'active')->get();
         $users_sb = Singbox::where('status', 'active')->get();
         $batchSize = 10;
@@ -514,7 +514,7 @@ class SettingsController extends Controller
     {
         $this->check();
         $date = date("Y-m-d---h-i-s");
-        Process::run("mysqldump -u '" .env('DB_USERNAME'). "' --password='" .env('DB_PASSWORD'). "' XPanel_plus > /var/www/html/app/storage/backup/XPanel-".$date.".sql");
+        Process::run("mysqldump -u '" .env('DB_USERNAME'). "' --password='" .env('DB_PASSWORD'). "' RPanel_plus > /var/www/html/app/storage/backup/RPanel-".$date.".sql");
         return redirect()->intended(route('settings', ['name' => 'backup']));
     }
     public function download_backup(Request $request,$name)

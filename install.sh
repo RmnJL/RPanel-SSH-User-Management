@@ -83,9 +83,9 @@ destination_directory="/var/www/"
 
   # Check if MySQL is installed
   if dpkg-query -W -f='${Status}' mariadb-server 2>/dev/null | grep -q "install ok installed"; then
-    adminuser=$(mysql -N -e "use XPanel_plus; select username from admins where permission='admin';")
-    adminpass=$(mysql -N -e "use XPanel_plus; select username from admins where permission='admin';")
-    ssh_tls_port=$(mysql -N -e "use XPanel_plus; select tls_port from settings where id='1';")
+    adminuser=$(mysql -N -e "use RPanel_plus; select username from admins where permission='admin';")
+    adminpass=$(mysql -N -e "use RPanel_plus; select username from admins where permission='admin';")
+    ssh_tls_port=$(mysql -N -e "use RPanel_plus; select tls_port from settings where id='1';")
   fi
 
   folder_path_cp="/var/www/html/cp"
@@ -662,6 +662,12 @@ END
   fi
   
 }
+
+# ایجاد دیتابیس RPanel_plus اگر وجود نداشت
+if ! mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    echo "Database RPanel_plus does not exist. Creating..."
+    mysql -u root -e "CREATE DATABASE RPanel_plus;"
+fi
 
 checkDATABASE() {
   mysql -e "create database RPanel_plus;" &

@@ -31,8 +31,8 @@ if [ -d "/var/www/html/cp" ]; then
 fi
 
 # Function to display the menu
-sshport=$(mysql -N -e "use XPanel_plus; select ssh_port from settings where id='1';")
-ssh_tls_port=$(mysql -N -e "use XPanel_plus; select tls_port from settings where id='1';")
+sshport=$(mysql -N -e "use RPanel_plus; select ssh_port from settings where id='1';")
+ssh_tls_port=$(mysql -N -e "use RPanel_plus; select tls_port from settings where id='1';")
 if [ -f "/var/www/xpanelport" ]; then
 domain=$(cat /var/www/xpanelport | grep "^DomainPanel")
 ssl=$(cat /var/www/xpanelport | grep "^SSLPanel")
@@ -122,8 +122,8 @@ function select_option() {
             mysql -e "GRANT ALL ON *.* TO '${username}'@'localhost';" &
             sed -i "s/DB_USERNAME=$adminuser/DB_USERNAME=$username/" /var/www/html/app/.env
             sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$password/g" /var/www/html/app/.env
-            mysql -e "USE XPanel_plus; UPDATE admins SET username = '${username}' where id='1';"
-            mysql -e "USE XPanel_plus; UPDATE admins SET password = '${password}' where id='1';"
+            mysql -e "USE RPanel_plus; UPDATE admins SET username = '${username}' where id='1';"
+            mysql -e "USE RPanel_plus; UPDATE admins SET password = '${password}' where id='1';"
             ;;
         2)
             echo "Please enter a SSH port:"
@@ -134,7 +134,7 @@ function select_option() {
             systemctl daemon-reload
             systemctl enable wss
             systemctl restart wss
-            mysql -e "USE XPanel_plus; UPDATE settings SET ssh_port = '${port}' where id='1';"
+            mysql -e "USE RPanel_plus; UPDATE settings SET ssh_port = '${port}' where id='1';"
             reboot
             ;;
         3)
@@ -147,7 +147,7 @@ connect = 0.0.0.0:$sshport
             " > /etc/stunnel/stunnel.conf
             systemctl enable stunnel4
             systemctl restart stunnel4
-            mysql -e "USE XPanel_plus; UPDATE settings SET tls_port = '${tlsport}' where id='1';"
+            mysql -e "USE RPanel_plus; UPDATE settings SET tls_port = '${tlsport}' where id='1';"
             reboot
             ;;
         4)
@@ -167,7 +167,7 @@ connect = 0.0.0.0:$sshport
         ;;
         
         6)
-       mysql -e "USE XPanel_plus; TRUNCATE TABLE admins;"
+       mysql -e "USE RPanel_plus; TRUNCATE TABLE admins;"
        echo "Removed All Admin"
         ;;
         
