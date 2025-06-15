@@ -94,11 +94,11 @@ Ubuntu 18+ (рекомендуется: Ubuntu 20)<br>
 bash /root/xpanel.sh OR bash xpanel.sh OR xpanel
 ```
 
-Для установки введите следующие команды:
+Для установки введите следующую команду:
 
 **Nginx веб-сервер**
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/install.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/install.sh --ipv4)
 ```
 
 Решение проблемы отсутствия звука и изображения в приложении <br>

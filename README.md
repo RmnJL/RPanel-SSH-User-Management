@@ -95,10 +95,8 @@ bash /root/rpanel.sh OR bash rpanel.sh  OR rpanel
 ```
 برای نصب کافیست دستور زیر را وارد کنید<br>
 
-**Nginx Web Server**
-
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/raminsoftdev/RPanel-SSH-User-Management/main/install.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/install.sh --ipv4)
 ```
 
 حل مشکل عدم ارتباط  تماس صوتی و تصویری در اپلیکشن

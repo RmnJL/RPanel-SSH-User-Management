@@ -78,12 +78,12 @@ Changing username, password and port as well as removing RPanel from the server 
 bash /root/rpanel.sh OR bash rpanel.sh OR rpanel
 ```
 
-To install the X-Panel simply input the following command in the terminal:<br>
+To install RPanel simply input the following command in the terminal:<br>
 
 **Nginx Web Server**
 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/raminsoftdev/RPanel-SSH-User-Management/master/install.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/install.sh --ipv4)
 ```
 
 To resolve audio and video call issues use this command:<br>

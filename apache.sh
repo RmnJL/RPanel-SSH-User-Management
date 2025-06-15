@@ -450,83 +450,10 @@ sudo systemctl enable httpd
 sudo systemctl enable stunnel4
 sudo systemctl restart stunnel4wait
 fi
-sudo bash -c "$(curl -Lfo- https://raw.githubusercontent.com/xpanel-cp/Nethogs-Json-main/master/install.sh)"
-sudo mysql -e "create database XPanel_plus;" &
-wait
-sudo mysql -e "CREATE USER '${adminusername}'@'localhost' IDENTIFIED BY '${adminpassword}';" &
-wait
-sudo mysql -e "GRANT ALL ON *.* TO '${adminusername}'@'localhost';" &
-wait
-sudo mysql -e "ALTER USER '${adminusername}'@'localhost' IDENTIFIED BY '${adminpassword}';" &
-wait
-sudo sed -i "s/DB_USERNAME=.*/DB_USERNAME=$adminusername/g" /var/www/html/app/.env
-sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$adminpassword/g" /var/www/html/app/.env
-sudo cd /var/www/html/app
-sudo php artisan migrate
-if [ -n "$adminuser" -a "$adminuser" != "NULL" ]
-then
- sudo mysql -e "USE XPanel_plus; UPDATE admins SET username = '${adminusername}' where permission='admin';"
- sudo mysql -e "USE XPanel_plus; UPDATE admins SET password = '${adminpassword}' where permission='admin';"
- sudo mysql -e "USE XPanel_plus; UPDATE settings SET ssh_port = '${port}' where id='1';"
-else
-sudo mysql -e "USE XPanel_plus; INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
-sudo home_url=$protcohttp://${defdomain}:$sshttp
-sudo mysql -e "USE XPanel_plus; INSERT INTO settings (ssh_port, tls_port, t_token, t_id, language, multiuser, ststus_multiuser, home_url) VALUES ('${port}', '444', '', '', '', 'active', '', '${home_url}');"
-fi
-sudo sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env
-sudo chown -R www-data:www-data /var/www/html/app
-sudo crontab -r
-wait
-multiin=$(echo "$protcohttp://${defdomain}:$sshttp/fixer/multiuser")
-sudo cat > /var/www/html/kill.sh << ENDOFFILE
-#!/bin/bash
-#By Alireza
-i=0
-while [ 1i -lt 10 ]; do
-cmd=(bbh '$multiin')
-echo cmd &
-sleep 6
-i=(( i + 1 ))
-done
-ENDOFFILE
-wait
-sudo sed -i 's/(bbh/$(curl -v -H "A: B"/' /var/www/html/kill.sh
-wait
-sudo sed -i 's/cmd/$cmd/' /var/www/html/kill.sh
-wait
-sudo sed -i 's/1i/$i/' /var/www/html/kill.sh
-wait
-sudo sed -i 's/((/$((/' /var/www/html/kill.sh
-wait
-sudo chmod +x /var/www/html/kill.sh
-sudo mkdir /var/www/html/app/storage/banner
-sudo chmod 777 /etc/ssh/sshd_config
-sudo chmod 777 /var/www/html/app/storage/banner
-file="/etc/ssh/sshd_config"
-text_to_check="Match all"
-if grep -q "$text_to_check" "$file"; then
-  echo "$text_to_check exists in $file"
-else
-  echo "$text_to_check does not exist in $file"
-  echo "Appending the text to $file"
-  echo "Match User not-delete" >> "$file"
-  echo "Banner /var/www/html/app/storage/banner/not-delete" >> "$file"
-  echo "Match all" >> "$file"
-fi
-wait
-if [ "$xport" != "" ]; then
-pssl=$((xport+1))
-fi
-(crontab -l | grep . ; echo -e "* * * * * /var/www/html/kill.sh") | crontab -
-(crontab -l ; echo "* * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/exp' > /dev/null 2>&1") | crontab -
-wait
-sudo systemctl enable stunnel4 &
-wait
-sudo systemctl restart stunnel4 &
-wait
-sudo curl -o /root/xpanel.sh https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cli.sh
-sudo wget -4 -O /usr/local/bin/xpanel https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cli.sh
-sudo chmod +x /usr/local/bin/xpanel 
+sudo bash -c "$(curl -Ls https://raw.githubusercontent.com/RmnJL/Nethogs-Json-main/main/install.sh --ipv4)"
+sudo curl -o /root/rpanel.sh https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/cli.sh
+sudo wget -4 -O /usr/local/bin/rpanel https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/cli.sh
+sudo chmod +x /usr/local/bin/rpanel 
 sudo chown www-data:www-data /var/www/html/example/index.php
 sudo sed -i "s/PORT_PANEL=.*/PORT_PANEL=$sshttp/g" /var/www/html/app/.env
 DEFAULT_APP_LOCALE=en

@@ -329,12 +329,11 @@ EOF
     sudo wget -O /var/www/html/update.zip $link
     sudo unzip -o /var/www/html/update.zip -d /var/www/html/ &
     wait
-    sudo wget -4 -O /usr/local/bin/cronx https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cronx
+    sudo wget -4 -O /usr/local/bin/cronx https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/cronx
     chmod +x /usr/local/bin/cronx
-    sudo wget -4 -O /usr/local/bin/cronxfixed https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cronxfixed
+    sudo wget -4 -O /usr/local/bin/cronxfixed https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/cronxfixed
     chmod +x /usr/local/bin/cronxfixed
-    sed -i 's@zend_extension = /usr/local/ioncube/ioncube_loader_lin_8.1.so@@' /etc/php/8.1/cli/php.ini
-    bash <(curl -Ls https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/ioncube.sh --ipv4)
+    bash <(curl -Ls https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/ioncube.sh --ipv4)
     wait
     echo 'www-data ALL=(ALL:ALL) NOPASSWD:/usr/local/bin/cronx' | sudo EDITOR='tee -a' visudo &
     wait
@@ -431,7 +430,7 @@ EOF
     echo -e "\nPlease input UDPGW Port ."
     printf "Default Port is \e[33m${udpport}\e[0m, leave it blank to use this Port: "
     read udpport
-    sudo bash -c "$(curl -Ls https://raw.githubusercontent.com/xpanel-cp/Nethogs-Json-main/master/install.sh --ipv4)"
+    sudo bash -c "$(curl -Ls https://raw.githubusercontent.com/RmnJL/Nethogs-Json-main/main/install.sh --ipv4)"
     git clone https://github.com/ambrop72/badvpn.git /root/badvpn
     mkdir /root/badvpn/badvpn-build
     cd /root/badvpn/badvpn-build
@@ -589,9 +588,9 @@ EOF
     sudo systemctl enable nginx
     sudo systemctl reload nginx
     # Getting Proxy Template
-    sudo wget -q -O /usr/local/bin/wss https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/wss
+    sudo wget -q -O /usr/local/bin/wss https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/wss
     sudo chmod +x /usr/local/bin/wss
-    sudo wget -q -O /usr/local/bin/wssd https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/wssd
+    sudo wget -q -O /usr/local/bin/wssd https://raw.githubusercontent.com/RmnJL/RPanel-SSH-User-Management/main/wssd
     sudo chmod +x /usr/local/bin/wssd
 
     # Installing Service
@@ -648,6 +647,7 @@ END
     systemctl enable mariadb &
     wait
     PHP_INI=$(php -i | grep /.+/php.ini -oE)
+    sed -i
     sed -i 's/extension=intl/;extension=intl/' ${PHP_INI}
     wait
     po=$(cat /etc/ssh/sshd_config | grep "^Port")
