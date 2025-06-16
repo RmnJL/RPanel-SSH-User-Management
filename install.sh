@@ -702,7 +702,6 @@ fi
     echo '#RPanel' >/var/www/rpanelport
     sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
     wait
-# ...existing code...
 }
 moreCONFIG() {
   sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env
@@ -768,7 +767,7 @@ ENDOFFILE
   DEFAULT_BOT_TOKEN=
   DEFAULT_BOT_ID_ADMIN=
   DEFAULT_BOT_API_ACCESS= 
-  DEFAULT_ANTI_USER= 
+  DEFAULT_ANTI
   DEFAULT_TRAFFIC_SERVER= 
   DEFAULT_BOT_LOG=
   DEFAULT_PORT_UDPGW=
