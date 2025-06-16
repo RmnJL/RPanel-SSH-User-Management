@@ -683,13 +683,13 @@ END
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
     # چک وجود جدول admins
-    if ! mysql -u root RPanel_plus -e "DESCRIBE admins;" 2>/dev/null | grep -q 'Field'; then
+    if mysql -u root RPanel_plus -e "SHOW TABLES LIKE 'admins';" 2>/dev/null | grep -q admins; then
+        mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+        mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+    else
         echo "Table admins does not exist. Creating..."
         mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
         mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
-    else
-        mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
-        mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
     fi
 else
     echo "Database RPanel_plus does not exist. Creating..."
@@ -706,4 +706,3 @@ fi
 echo '#RPanel' >/var/www/rpanelport
 sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
 wait
-# حذف } اضافی انتهای اسکریپت (در صورت وجود)
