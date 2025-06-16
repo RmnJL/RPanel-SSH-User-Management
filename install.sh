@@ -269,10 +269,10 @@ startINSTALL() {
     install_package php8.1-mbstring
     install_package php8.1-zip
     install_package php8.1-intl
-    install_package php8.1-simplexml
-    wait
+install_package php8.1-simplexml
+wait
 
-    phpv=$(php -v)
+phpv=$(php -v)
     if [[ $phpv == *"8.1"* ]]; then
       apt autoremove -y
       echo "PHP Is Installed :)"
