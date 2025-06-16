@@ -36,7 +36,8 @@ if [ -f "$ENV_FILE" ]; then
   cp "$ENV_FILE" "$COPY_FILE"
   chmod 644 /var/www/html/.env_copy
 fi
-checkOS
+# تابع بررسی سیستم عامل
+checkOS() {
   # List of supported distributions
   #supported_distros=("Ubuntu" "Debian" "Fedora" "CentOS" "Arch")
   supported_distros=("Ubuntu")
@@ -282,10 +283,20 @@ startINSTALL() {
       apt remove php* -y
       apt remove php -y
       apt autoremove -y
-      apt install php8.1 php8.1-mysql php8.1-xml php8.1-curl cron -y
-      sudo apt install php8.1-fpm
-      sudo apt install php8.1 php8.1-cli php8.1-common  php8.1-opcache php8.1-mysql php8.1-mbstring php8.1-zip php8.1-intl php8.1-simplexml -y
-
+      # نصب PHP 8.1 و ماژول‌های مورد نیاز فقط با تابع install_package
+      install_package php8.1
+      install_package php8.1-mysql
+      install_package php8.1-xml
+      install_package php8.1-curl
+      install_package php8.1-fpm
+      install_package php8.1-cli
+      install_package php8.1-common
+      install_package php8.1-opcache
+      install_package php8.1-mbstring
+      install_package php8.1-zip
+      install_package php8.1-intl
+      install_package php8.1-simplexml
+      echo "PHP 8.1 and required modules installed."
     fi
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
     echo "/bin/false" >>/etc/shells
@@ -863,17 +874,7 @@ ENDOFFILE
   sed -i "s/CRON_TRAFFIC=.*/CRON_TRAFFIC=$CRON_TRAFFIC/g" /var/www/html/app/.env
   sed -i "s/DAY=.*/DAY=$DAY/g" /var/www/html/app/.env
   sed -i "s/PORT_DROPBEAR=.*/PORT_DROPBEAR=$PORT_DROPBEAR/g" /var/www/html/app/.env
-  sed -i "s/TRAFFIC_BASE=.*/TRAFFIC_BASE=$TRAFFIC_BASE/g" /var/www/html/app/.env
-  sed -i "s/STATUS_LOG=.*/STATUS_LOG=$STATUS_LOG/g" /var/www/html/app/.env
-  sed -i "s/BOT_TOKEN=.*/BOT_TOKEN=$BOT_TOKEN/g" /var/www/html/app/.env
-  sed -i "s/BOT_ID_ADMIN=.*/BOT_ID_ADMIN=$BOT_ID_ADMIN/g" /var/www/html/app/.env
-  sed -i "s/BOT_API_ACCESS=.*/BOT_API_ACCESS=$BOT_API_ACCESS/g" /var/www/html/app/.env
-  sed -i "s/ANTI_USER=.*/ANTI_USER=$ANTI_USER/g" /var/www/html/app/.env
-  sed -i "s/TRAFFIC_SERVER=.*/TRAFFIC_SERVER=$TRAFFIC_SERVER/g" /var/www/html/app/.env
-  sed -i "s/BOT_LOG=.*/BOT_LOG=$BOT_LOG/g" /var/www/html/app/.env
-  sed -i "s/PORT_UDPGW=.*/PORT_UDPGW=$PORT_UDPGW/g" /var/www/html/app/.env
-  sed -i "s/MAIL_STATUS=.*/MAIL_STATUS=$MAIL_STATUS/g" /var/www/html/app/.env
-  sed -i "s/MAIL_HOST=.*/MAIL_HOST=$MAIL_HOST/g" /var/www/html/app/.env
+  sed -i "s/TRAFFIC_BASE=.*/TRAFFIC_BASE=$TRAFFIC_BASE/g" /var/www/html/app
   sed -i "s/MAIL_PORT=.*/MAIL_PORT=$MAIL_PORT/g" /var/www/html/app/.env
   sed -i "s/MAIL_USERNAME=.*/MAIL_USERNAME=$MAIL_USERNAME/g" /var/www/html/app/.env
   sed -i "s/MAIL_PASSWORD=.*/MAIL_PASSWORD=$MAIL_PASSWORD/g" /var/www/html/app/.env
