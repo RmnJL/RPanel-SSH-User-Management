@@ -682,15 +682,8 @@ END
 # ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
-    # چک وجود جدول admins
-    if mysql -u root RPanel_plus -e "SHOW TABLES LIKE 'admins';" 2>/dev/null | grep -q admins; then
-        mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
-        mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
-    else
-        echo "Table admins does not exist. Creating..."
-        mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
-        mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
-    fi
+    mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+    mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
 else
     echo "Database RPanel_plus does not exist. Creating..."
     mysql -u root -e "CREATE DATABASE RPanel_plus;"
@@ -706,3 +699,289 @@ fi
 echo '#RPanel' >/var/www/rpanelport
 sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
 wait
+
+# ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
+if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    echo "Database RPanel_plus exists. Updating tables and admin..."
+    # به‌روزرسانی جداول و admin
+    mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+    mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+else
+    echo "Database RPanel_plus does not exist. Creating..."
+    mysql -u root -e "CREATE DATABASE RPanel_plus;"
+    mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
+    mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
+fi
+
+# فایل rpanelport: همیشه overwrite شود
+if [ -f "/var/www/rpanelport" ]; then
+    echo "Updating rpanelport file..."
+    rm -f /var/www/rpanelport
+fi
+# ایجاد مجدد فایل rpanelport
+echo '#RPanel' >/var/www/rpanelport
+sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
+wait
+}
+moreCONFIG() {
+  sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env
+  sed -i "s/PORT_UDPGW=.*/PORT_UDPGW=$udpport/g" /var/www/html/app/.env
+  sudo chown -R www-data:www-data /var/www/html/app
+  crontab -r
+  wait
+
+  multiin=$(echo "$protcohttp://${defdomain}:$sshttp/fixer/multiuser")
+  cat >/var/www/html/kill.sh <<ENDOFFILE
+#!/bin/bash
+#By Alireza
+i=0
+while [ 1i -lt 10 ]; do
+cmd=(bbh '$multiin')
+echo cmd &
+sleep 6
+i=(( i + 1 ))
+done
+ENDOFFILE
+  wait
+  sudo sed -i 's/(bbh/$(curl -v -H "A: B"/' /var/www/html/kill.sh
+  wait
+  sudo sed -i 's/cmd/$cmd/' /var/www/html/kill.sh
+  wait
+  sudo sed -i 's/1i/$i/' /var/www/html/kill.sh
+  wait
+  sudo sed -i 's/((/$((/' /var/www/html/kill.sh
+  wait
+  chmod +x /var/www/html/
+  (crontab -l ; echo "*/15 * * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/checkfilter' > /dev/null 2>&1") | crontab -
+  (crontab -l ; echo "0 0 * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/send/email/3day' > /dev/null 2>&1") | crontab -
+  (crontab -l ; echo "0 0 * * * wget -q -O /dev/null '$protcohttp://${defdomain}:$sshttp/fixer/send/email/24h' > /dev/null 2>&1") | crontab -
+  crontab -l | sed '/dropbear\.sh/d' | crontab -
+  if [ -f "/var/www/html/dropbear.sh" ]; then
+    rm -rf "/var/www/html/dropbear.sh"
+  fi
+  wait
+  systemctl enable stunnel4 &
+  wait
+  systemctl restart stunnel4 &
+  wait
+  sudo mkdir -p /rpanel
+  wait
+  curl -sL -o /usr/local/bin/xp_user_limit https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/xp_user_limit.sh
+  chmod +x /usr/local/bin/xp_user_limit
+  echo 'www-data ALL=(ALL:ALL) NOPASSWD:/usr/local/bin/xp_user_limit' | sudo EDITOR='tee -a' visudo
+  wait
+  curl -o /root/xpanel.sh https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cli.sh
+  sudo wget -4 -O /usr/local/bin/xpanel https://raw.githubusercontent.com/xpanel-cp/XPanel-SSH-User-Management/master/cli.sh
+  chmod +x /usr/local/bin/xpanel
+  chown www-data:www-data /var/www/html/example/
+  chown www-data:www-data /var/www/html/example/index.php
+  sed -i "s/PORT_PANEL=.*/PORT_PANEL=$sshttp/g" /var/www/html/app/.env
+  DEFAULT_APP_LOCALE=en
+  DEFAULT_APP_MODE=light
+  DEFAULT_PANEL_DIRECT=cp
+  DEFAULT_CRON_TRAFFIC=active
+  DEFAULT_DAY=active
+  DEFAULT_PORT_DROPBEAR=2083
+  DEFAULT_TRAFFIC_BASE=12
+  DEFAULT_STATUS_LOG=deactive
+  DEFAULT_BOT_TOKEN=
+  DEFAULT_BOT_ID_ADMIN=
+  DEFAULT_BOT_API_ACCESS=
+  DEFAULT_ANTI=
+  DEFAULT_TRAFFIC_SERVER=
+  DEFAULT_BOT_LOG=
+  DEFAULT_PORT_UDPGW=
+  DEFAULT_MAIL_STATUS=
+  DEFAULT_MAIL_HOST=
+  DEFAULT_MAIL_PORT=
+  DEFAULT_MAIL_USERNAME=
+  DEFAULT_MAIL_PASSWORD=
+  DEFAULT_MAIL_FROM_ADDRESS=
+  DEFAULT_MAIL_FROM_NAME=
+  DEFAULT_GB_CHANGE=
+
+  if [ -f /var/www/html/.env_copy ]; then
+    while IFS= read -r line; do
+      key=$(echo "$line" | awk -F'=' '{print $1}')
+      value=$(echo "$line" | awk -F'=' '{print $2}')
+
+      if [ "$key" = "APP_LOCALE" ]; then
+        APP_LOCALE="$value"
+      elif [ "$key" = "APP_MODE" ]; then
+        APP_MODE="$value"
+      elif [ "$key" = "PANEL_DIRECT" ]; then
+        PANEL_DIRECT="$value"
+      elif [ "$key" = "CRON_TRAFFIC" ]; then
+        CRON_TRAFFIC="$value"
+      elif [ "$key" = "DAY" ]; then
+        DAY="$value"
+      elif [ "$key" = "PORT_DROPBEAR" ]; then
+        PORT_DROPBEAR="$value"
+      elif [ "$key" = "TRAFFIC_BASE" ]; then
+        TRAFFIC_BASE="$value"
+      elif [ "$key" = "STATUS_LOG" ]; then
+        STATUS_LOG="$value"
+      elif [ "$key" = "BOT_TOKEN" ]; then
+        BOT_TOKEN="$value"
+      elif [ "$key" = "BOT_ID_ADMIN" ]; then
+        BOT_ID_ADMIN="$value"
+      elif [ "$key" = "BOT_API_ACCESS" ]; then
+        BOT_API_ACCESS="$value"
+      elif [ "$key" = "ANTI_USER" ]; then
+        ANTI_USER="$value"
+      elif [ "$key" = "TRAFFIC_SERVER" ]; then
+        TRAFFIC_SERVER="$value"
+      elif [ "$key" = "BOT_LOG" ]; then
+        BOT_LOG="$value"
+      elif [ "$key" = "PORT_UDPGW" ]; then
+        PORT_UDPGW="$value"
+      elif [ "$key" = "MAIL_STATUS" ]; then
+        MAIL_STATUS="$value"
+      elif [ "$key" = "MAIL_HOST" ]; then
+        MAIL_HOST="$value"  
+      elif [ "$key" = "MAIL_PORT" ]; then
+        MAIL_PORT="$value" 
+      elif [ "$key" = "MAIL_USERNAME" ]; then
+        MAIL_USERNAME="$value" 
+      elif [ "$key" = "MAIL_PASSWORD" ]; then
+        MAIL_PASSWORD="$value" 
+      elif [ "$key" = "MAIL_FROM_ADDRESS" ]; then
+        MAIL_FROM_ADDRESS="$value" 
+      elif [ "$key" = "MAIL_FROM_NAME" ]; then
+        MAIL_FROM_NAME="$value" 
+      elif [ "$key" = "GB_CHANGE" ]; then
+        GB_CHANGE="$value" 
+      fi
+    done </var/www/html/.env_copy
+  fi
+
+  APP_LOCALE="${APP_LOCALE:-$DEFAULT_APP_LOCALE}"
+  APP_MODE="${APP_MODE:-$DEFAULT_APP_MODE}"
+  PANEL_DIRECT="${PANEL_DIRECT:-$DEFAULT_PANEL_DIRECT}"
+  CRON_TRAFFIC="${CRON_TRAFFIC:-$DEFAULT_CRON_TRAFFIC}"
+  DAY="${DAY:-$DEFAULT_DAY}"
+  PORT_DROPBEAR="${PORT_DROPBEAR:-$DEFAULT_PORT_DROPBEAR}"
+  TRAFFIC_BASE="${TRAFFIC_BASE:-$DEFAULT_TRAFFIC_BASE}"
+  STATUS_LOG="${STATUS_LOG:-$DEFAULT_STATUS_LOG}"
+  BOT_TOKEN="${BOT_TOKEN:-$DEFAULT_BOT_TOKEN}"
+  BOT_ID_ADMIN="${BOT_ID_ADMIN:-$DEFAULT_BOT_ID_ADMIN}"
+  BOT_API_ACCESS="${BOT_API_ACCESS:-$DEFAULT_BOT_API_ACCESS}"
+  ANTI_USER="${ANTI_USER:-$DEFAULT_ANTI_USER}"
+  TRAFFIC_SERVER="${TRAFFIC_SERVER:-$DEFAULT_TRAFFIC_SERVER}"
+  BOT_LOG="${BOT_LOG:-$DEFAULT_BOT_LOG}"
+  PORT_UDPGW="${PORT_UDPGW:-$DEFAULT_PORT_UDPGW}"
+  MAIL_STATUS="${MAIL_STATUS:-$DEFAULT_MAIL_STATUS}"
+  MAIL_HOST="${BOT_MAIL_HOST:-$DEFAULT_MAIL_HOST}"
+  MAIL_PORT="${BOT_MAIL_PORT:-$DEFAULT_MAIL_PORT}"
+  MAIL_USERNAME="${BOT_MAIL_USERNAME:-$DEFAULT_MAIL_USERNAME}"
+  MAIL_PASSWORD="${MAIL_PASSWORD:-$DEFAULT_MAIL_PASSWORD}"
+  MAIL_FROM_ADDRESS="${MAIL_FROM_ADDRESS:-$DEFAULT_MAIL_FROM_ADDRESS}"
+  MAIL_FROM_NAME="${MAIL_FROM_NAME:-$DEFAULT_MAIL_FROM_NAME}"
+  GB_CHANGE="${GB_CHANGE:-$DEFAULT_GB_CHANGE}"
+
+  sed -i "s/APP_LOCALE=.*/APP_LOCALE=$APP_LOCALE/g" /var/www/html/app/.env
+  sed -i "s/APP_MODE=.*/APP_MODE=$APP_MODE/g" /var/www/html/app/.env
+  sed -i "s/PANEL_DIRECT=.*/PANEL_DIRECT=$PANEL_DIRECT/g" /var/www/html/app/.env
+  sed -i "s/CRON_TRAFFIC=.*/CRON_TRAFFIC=$CRON_TRAFFIC/g" /var/www/html/app/.env
+  sed -i "s/DAY=.*/DAY=$DAY/g" /var/www/html/app/.env
+  sed -i "s/PORT_DROPBEAR=.*/PORT_DROPBEAR=$PORT_DROPBEAR/g" /var/www/html/app/.env
+  sed -i "s/TRAFFIC_BASE=.*/TRAFFIC_BASE=$TRAFFIC_BASE/g" /var/www/html/app
+  sed -i "s/MAIL_PORT=.*/MAIL_PORT=$MAIL_PORT/g" /var/www/html/app/.env
+  sed -i "s/MAIL_USERNAME=.*/MAIL_USERNAME=$MAIL_USERNAME/g" /var/www/html/app/.env
+  sed -i "s/MAIL_PASSWORD=.*/MAIL_PASSWORD=$MAIL_PASSWORD/g" /var/www/html/app/.env
+  sed -i "s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS/g" /var/www/html/app/.env
+  sed -i "s/MAIL_FROM_NAME=.*/MAIL_FROM_NAME=$MAIL_FROM_NAME/g" /var/www/html/app/.env
+  sed -i "s/GB_CHANGEE=.*/GB_CHANGE=$GB_CHANGE/g" /var/www/html/app/.env
+  sudo systemctl stop apache2
+  sudo systemctl disable apache2
+  sudo apt-get remove apache2 -y
+  sudo apt autoremove -y
+  cp /var/www/index.php /var/www/html/example/
+  clear
+}
+endINSTALL() {
+  echo -e "************ RPanel ************ \n"
+  echo -e "RPanel Link : $protcohttp://${defdomain}:$sshttp/login"
+  echo -e "Username : ${adminusername}"
+  echo -e "Password : ${adminpassword}"
+  echo -e "-------- Connection Details ----------- \n"
+  echo -e "IP : $ipv4 "
+  echo -e "SSH port : ${port} "
+  echo -e "SSH + TLS port : ${sshtls_port} \n"
+  echo -e "************ Check Install Packag and Moudels ************ \n"
+}
+check_install() {
+  if dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q "install ok installed"; then
+    echo -e "$1 \e[34m is installed \e[0m"
+  else
+    if which $1 &>/dev/null; then
+      echo -e "$1 \e[34m is installed \e[0m"
+    else
+      echo -e "$1 \e[31m is not installed \e[0m"
+    fi
+  fi
+}
+
+# TODO: برای افزایش امنیت و پایداری، قبل از نصب هر پکیج، وجود آن بررسی و در صورت نیاز نصب شود. همچنین، مدیریت خطا و لاگ‌گیری بهبود یابد.
+
+# پاک‌سازی نصب قبلی RPanel
+clean_previous_install() {
+  echo -e "\e[33mدر حال بررسی و پاک‌سازی نصب قبلی RPanel...\e[0m"
+  # حذف دیتابیس RPanel_plus در صورت وجود
+  if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    mysql -u root -e "DROP DATABASE RPanel_plus;"
+    echo "دیتابیس RPanel_plus حذف شد."
+  fi
+  # حذف فایل‌ها و دایرکتوری‌های اصلی
+  rm -rf /var/www/html/app
+  rm -rf /var/www/html/cp
+  rm -rf /var/www/html/example
+  rm -f /var/www/rpanelport
+  rm -f /var/www/html/.env_copy
+  rm -f /var/www/html/update.zip
+  # حذف سرویس‌های systemd مرتبط
+  for svc in wss wssd videocall; do
+    systemctl stop $svc 2>/dev/null
+    systemctl disable $svc 2>/dev/null
+    rm -f /etc/systemd/system/$svc.service
+  done
+  systemctl daemon-reload
+  # حذف کاربر سیستم videocall
+  id videocall &>/dev/null && userdel -r videocall
+  # حذف ruleهای visudo اضافه شده برای www-data
+  sed -i '/www-data ALL=(ALL:ALL) NOPASSWD:/d' /etc/sudoers
+  echo -e "\e[32mپاک‌سازی نصب قبلی RPanel انجام شد.\e[0m"
+}
+
+# اجرای پاک‌سازی قبل از هر نصب جدید
+clean_previous_install
+checkOS
+configSSH
+setCONFIG
+wellcomeINSTALL
+userINPU
+startINSTALL
+checkDATABASE
+moreCONFIG
+endINSTALL
+# Check and display status for each package
+check_install software-properties-common
+check_install stunnel4
+check_install cmake
+check_install screenfetch
+check_install openssl
+check_install nginx
+check_install zip
+check_install unzip
+check_install net-tools
+check_install curl
+check_install mariadb-server
+check_install php
+check_install npm
+check_install coreutils
+check_install php8.1
+check_install php8.1-mysql
+check_install php8.1-xml
+check_install php8.1-curl
+check_install cron
+check_install nethogs
