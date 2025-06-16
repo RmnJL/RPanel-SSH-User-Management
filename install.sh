@@ -265,27 +265,27 @@ startINSTALL() {
     install_package php8.1-curl
     install_package php8.1-fpm
     install_package php8.1-common
-    install_package php8.1-opcache
-    install_package php8.1-mbstring
-    install_package php8.1-zip
-    install_package php8.1-intl
+install_package php8.1-opcache
+install_package php8.1-mbstring
+install_package php8.1-zip
+install_package php8.1-intl
 install_package php8.1-simplexml
 wait
 
 phpv=$(php -v)
 if [[ $phpv == *"8.1"* ]]; then
-apt autoremove -y
-echo "PHP Is Installed :)"
+  apt autoremove -y
+  echo "PHP Is Installed :)"
 else
-rm -fr /etc/php/7.4/apache2/conf.d/00-ioncube.ini
-sudo apt-get purge '^php7.*' -y
-apt remove php* -y
-apt remove php -y
-apt autoremove -y
-# نصب PHP 8.1 و ماژول‌های مورد نیاز فقط با تابع install_package
-install_package php8.1
-install_package php8.1-mysql
-install_package php8.1-xml
+  rm -fr /etc/php/7.4/apache2/conf.d/00-ioncube.ini
+  sudo apt-get purge '^php7.*' -y
+  apt remove php* -y
+  apt remove php -y
+  apt autoremove -y
+  # نصب PHP 8.1 و ماژول‌های مورد نیاز فقط با تابع install_package
+  install_package php8.1
+  install_package php8.1-mysql
+  install_package php8.1-xml
 install_package php8.1-curl
 install_package php8.1-fpm
 install_package php8.1-cli
