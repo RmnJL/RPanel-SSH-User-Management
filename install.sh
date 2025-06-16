@@ -103,11 +103,11 @@ destination_directory="/var/www/"
   else
     sshtls_port=444
   fi
-  if test -f "/var/www/xpanelport"; then
-    domainp=$(cat /var/www/xpanelport | grep "^DomainPanel")
-    sslp=$(cat /var/www/xpanelport | grep "^SSLPanel")
-    xpo=$(cat /var/www/xpanelport | grep "^Xpanelport")
-    xport=$(echo "$xpo" | sed "s/Xpanelport //g")
+  if test -f "/var/www/rpanelport"; then
+    domainp=$(cat /var/www/rpanelport | grep "^DomainPanel")
+    sslp=$(cat /var/www/rpanelport | grep "^SSLPanel")
+    xpo=$(cat /var/www/rpanelport | grep "^RPanelport")
+    xport=$(echo "$xpo" | sed "s/RPanelport //g")
     dmp=$(echo "$domainp" | sed "s/DomainPanel //g")
     dmssl=$(echo "$sslp" | sed "s/SSLPanel //g")
   else
@@ -338,7 +338,7 @@ EOF
     sed -i 's/ENABLED=0/ENABLED=1/g' /etc/default/stunnel4
     service stunnel4 restart
 
-    if test -f "/var/www/xpanelport"; then
+    if test -f "/var/www/rpanelport"; then
       echo "File exists rpanelport"
     else
       touch /var/www/rpanelport
@@ -597,8 +597,8 @@ server {
 EOF
     sed -i "s/serverPort/$serverPort/g" /etc/nginx/sites-available/default
     sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-    echo '#Xpanel' >/var/www/xpanelport
-    sudo sed -i -e '$a\'$'\n''Xpanelport '$serverPort /var/www/xpanelport
+    echo '#RPanel' >/var/www/rpanelport
+    sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
     wait
     ##Restart the webserver server to use new port
     sudo nginx -t
@@ -678,42 +678,31 @@ END
     systemctl restart stunnel4
     wait
   fi
-  
 }
 
-# ایجاد دیتابیس RPanel_plus اگر وجود نداشت
-if ! mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+# ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
+if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    echo "Database RPanel_plus exists. Updating tables and admin..."
+    # به‌روزرسانی جداول و admin
+    mysql -u root -e "USE RPanel_plus; ALTER TABLE admins MODIFY username VARCHAR(255);"
+    mysql -u root -e "USE RPanel_plus; UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+else
     echo "Database RPanel_plus does not exist. Creating..."
     mysql -u root -e "CREATE DATABASE RPanel_plus;"
+    mysql -u root -e "USE RPanel_plus; CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
+    mysql -u root -e "USE RPanel_plus; INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
 fi
 
-checkDATABASE() {
-  mysql -e "create database RPanel_plus;" &
-  wait
-  mysql -e "CREATE USER '${adminusername}'@'localhost' IDENTIFIED BY '${adminpassword}';" &
-  wait
-  mysql -e "GRANT ALL ON *.* TO '${adminusername}'@'localhost';" &
-  wait
-  mysql -e "ALTER USER '${adminusername}'@'localhost' IDENTIFIED BY '${adminpassword}';" &
-  wait
-  sed -i "s/DB_USERNAME=.*/DB_USERNAME=$adminusername/g" /var/www/html/app/.env
-  sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$adminpassword/g" /var/www/html/app/.env
-  cd /var/www/html/app
-  php artisan migrate
-  if [ -n "$adminuser" -a "$adminuser" != "NULL" ]; then
-    mysql -e "USE RPanel_plus; UPDATE admins SET username = '${adminusername}' where permission='admin';"
-    mysql -e "USE RPanel_plus; UPDATE admins SET password = '${adminpassword}' where permission='admin';"
-    mysql -e "USE RPanel_plus; UPDATE settings SET ssh_port = '${port}' where id='1';"
-    php artisan clear-compiled
-    php artisan cache:clear
-    php artisan config:clear
-    php artisan view:clear
-
-  else
-    mysql -e "USE RPanel_plus; INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
-    home_url=$protcohttp://${defdomain}:$sshttp
-    mysql -e "USE RPanel_plus; INSERT INTO settings (ssh_port, tls_port, t_token, t_id, language, multiuser, ststus_multiuser, home_url) VALUES ('${port}', '444', '', '', '', 'active', '', '${home_url}');"
-  fi
+# فایل rpanelport: همیشه overwrite شود
+if [ -f "/var/www/rpanelport" ]; then
+    echo "Updating rpanelport file..."
+    rm -f /var/www/rpanelport
+fi
+# ایجاد مجدد فایل rpanelport
+    echo '#RPanel' >/var/www/rpanelport
+    sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
+    wait
+# ...existing code...
 }
 moreCONFIG() {
   sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env

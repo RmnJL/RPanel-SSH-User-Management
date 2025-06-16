@@ -86,14 +86,14 @@ then
 else
      sshtls_port=444
 fi
-if test -f "/var/www/xpanelport"; then
-domainp=$(cat /var/www/xpanelport | grep "^DomainPanel")
-sslp=$(cat /var/www/xpanelport | grep "^SSLPanel")
-xpo=$(cat /var/www/xpanelport | grep "^Xpanelport")
-xport=$(echo "$xpo" | sed "s/Xpanelport //g")
-dmp=$(echo "$domainp" | sed "s/DomainPanel //g")
-dmssl=$(echo "$sslp" | sed "s/SSLPanel //g")
-else
+if test -f "/var/www/rpanelport"; then
+    domainp=$(cat /var/www/rpanelport | grep "^DomainPanel")
+    sslp=$(cat /var/www/rpanelport | grep "^SSLPanel")
+    xpo=$(cat /var/www/rpanelport | grep "^RPanelport")
+    xport=$(echo "$xpo" | sed "s/RPanelport //g")
+    dmp=$(echo "$domainp" | sed "s/DomainPanel //g")
+    dmssl=$(echo "$sslp" | sed "s/SSLPanel //g")
+  else
 xport=""
 dmp=""
 dmssl=""

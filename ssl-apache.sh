@@ -1,12 +1,12 @@
 #!/bin/bash
 crontab -r
-xpo=$(cat /var/www/xpanelport | grep "^Xpanelport")
-xpd=$(cat /var/www/xpanelport | grep "^DomainPanel")
-xport=$(echo "$xpo" | sed "s/Xpanelport //g")
+xpo=$(cat /var/www/rpanelport | grep "^RPanelport")
+xpd=$(cat /var/www/rpanelport | grep "^DomainPanel")
+xport=$(echo "$xpo" | sed "s/RPanelport //g")
 portssl=$((xport+1))
 xpdomain=$(echo "$xpd" | sed "s/DomainPanel //g")
 read -rp "Please input IP Server: " ip
-read -rp "Please enter the pointed domain / sub-domain name: " domain
+read -rp "Pleasssudo sed -i -e '$a\'\$'\n''SSLPanel True' /var/www/rpanelportdo sed -i -e '$a\'\$'\n''DomainPanel '$domain /var/www/rpanelport enter the pointed domain / sub-domain name: " domain
 
 systemctl stop apache2
 
@@ -295,7 +295,7 @@ sudo service apache2 restart
 fi
 
 if [ "$xpdomain" != "" ]; then
-sed -i 's/$xpdomain/$domain/' /var/www/xpanelport
+sed -i 's/$xpdomain/$domain/' /var/www/rpanelport
 else
 sudo sed -i -e '$a\'$'\n''DomainPanel '$domain /var/www/xpanelport
 sudo sed -i -e '$a\'$'\n''SSLPanel True' /var/www/xpanelport

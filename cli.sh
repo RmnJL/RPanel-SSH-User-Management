@@ -33,11 +33,11 @@ fi
 # Function to display the menu
 sshport=$(mysql -N -e "use RPanel_plus; select ssh_port from settings where id='1';")
 ssh_tls_port=$(mysql -N -e "use RPanel_plus; select tls_port from settings where id='1';")
-if [ -f "/var/www/xpanelport" ]; then
-domain=$(cat /var/www/xpanelport | grep "^DomainPanel")
-ssl=$(cat /var/www/xpanelport | grep "^SSLPanel")
-panelport=$(cat /var/www/xpanelport | grep "^Xpanelport")
-panelport=$(echo "$panelport" | sed "s/Xpanelport //g")
+if [ -f "/var/www/rpanelport" ]; then
+domain=$(cat /var/www/rpanelport | grep "^DomainPanel")
+ssl=$(cat /var/www/rpanelport | grep "^SSLPanel")
+panelport=$(cat /var/www/rpanelport | grep "^RPanelport")
+panelport=$(echo "$panelport" | sed "s/RPanelport //g")
 domain=$(echo "$domain" | sed "s/DomainPanel //g")
 ssl=$(echo "$ssl" | sed "s/SSLPanel //g")
 else
@@ -78,16 +78,16 @@ function show_menu() {
 	echo -e "$BLUE│$NC ${ORANGE}•${NC} SSH PORT: $sshport"
 	echo -e "$BLUE│$NC ${ORANGE}•${NC} Username: ${BLUE}$adminuser${NC}"
 	echo -e "$BLUE│$NC ${ORANGE}•${NC} Password: ${BLUE}$def_pw${NC}"
-	echo -e "$BLUE│$NC ${ORANGE}•${NC} XPanel Link: \"http://$domain:$def_port/$def_cp/login\""
+	echo -e "$BLUE│$NC ${ORANGE}•${NC} RPanel Link: \"http://$domain:$def_port/$def_cp/login\""
 	echo -e "$BLUE│$NC ${ORANGE}•${NC} UPTime: $(uptime -p | sed 's/up //')"
 	echo -e "$BLUE└────────────────────────────────────────────────────────────────•${NC}"
 	echo -e "$BLUE•────────────────────────────────────────────────────────────────┐$NC"
 	echo -e " ${BLUE}[1]${NC} ${ORANGE}•${NC} ${WHITE}Change Username AND Password${NC}"
 	echo -e " ${BLUE}[2]${NC} ${ORANGE}•${NC} ${WHITE}Change Port SSH${NC}"
 	echo -e " ${BLUE}[3]${NC} ${ORANGE}•${NC} ${WHITE}Change Port SSH TLS${NC}"
-	echo -e " ${BLUE}[4]${NC} ${ORANGE}•${NC} ${WHITE}Update XPanel Nginx Web Server${NC}"
-	echo -e " ${BLUE}[5]${NC} ${ORANGE}•${NC} ${WHITE}Remove XPanel${NC}"
-	echo -e " ${BLUE}[6]${NC} ${ORANGE}•${NC} ${WHITE}Remove All Admin XPanel${NC}"
+	echo -e " ${BLUE}[4]${NC} ${ORANGE}•${NC} ${WHITE}Update RPanel Nginx Web Server${NC}"
+	echo -e " ${BLUE}[5]${NC} ${ORANGE}•${NC} ${WHITE}Remove RPanel${NC}"
+	echo -e " ${BLUE}[6]${NC} ${ORANGE}•${NC} ${WHITE}Remove All Admin RPanel${NC}"
 	echo -e " ${BLUE}[7]${NC} ${ORANGE}•${NC} ${WHITE}Blocked Port 80 and 8443 IRAN${NC}"
 	echo -e " ${BLUE}[8]${NC} ${ORANGE}•${NC} ${WHITE}UnBlock Port 80 and 8443 IRAN${NC}"
 	echo -e " ${BLUE}[9]${NC} ${ORANGE}•${NC} ${WHITE}Install Dropbear${NC}"
