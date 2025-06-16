@@ -702,6 +702,29 @@ fi
 echo '#RPanel' >/var/www/rpanelport
 sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
 wait
+
+# ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
+if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    echo "Database RPanel_plus exists. Updating tables and admin..."
+    # به‌روزرسانی جداول و admin
+    mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+    mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+else
+    echo "Database RPanel_plus does not exist. Creating..."
+    mysql -u root -e "CREATE DATABASE RPanel_plus;"
+    mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
+    mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
+fi
+
+# فایل rpanelport: همیشه overwrite شود
+if [ -f "/var/www/rpanelport" ]; then
+    echo "Updating rpanelport file..."
+    rm -f /var/www/rpanelport
+fi
+# ایجاد مجدد فایل rpanelport
+echo '#RPanel' >/var/www/rpanelport
+sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
+wait
 }
 moreCONFIG() {
   sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env
