@@ -272,30 +272,34 @@ install_package php8.1-intl
 install_package php8.1-simplexml
 wait
 
-phpv=$(php -v)
-if [[ $phpv == *"8.1"* ]]; then
+# پیدا کردن آخرین نسخه PHP موجود در مخازن
+latest_php_version=$(apt-cache search --names-only '^php[0-9]\.[0-9]$' | awk '{print $1}' | sort -V | tail -n1 | grep -oP 'php\K[0-9]\.[0-9]')
+if [ -z "$latest_php_version" ]; then
+  latest_php_version="8.1" # پیش‌فرض اگر پیدا نشد
+fi
+
+# نصب PHP و ماژول‌های اصلی برای آخرین نسخه
+php_packages=(php${latest_php_version} php${latest_php_version}-mysql php${latest_php_version}-xml php${latest_php_version}-curl php${latest_php_version}-fpm php${latest_php_version}-cli php${latest_php_version}-common php${latest_php_version}-opcache php${latest_php_version}-mbstring php${latest_php_version}-zip php${latest_php_version}-intl php${latest_php_version}-simplexml)
+for pkg in "${php_packages[@]}"; do
+  install_package "$pkg"
+done
+wait
+
+# بررسی نسخه نصب شده PHP
+phpv=$(php -v | head -n1)
+installed_php_version=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
+if dpkg-query -W -f='${Status}' "php${installed_php_version}" 2>/dev/null | grep -q "install ok installed"; then
   apt autoremove -y
-  echo "PHP Is Installed :"
+  echo "PHP $installed_php_version is installed."
 else
-  rm -fr /etc/php/7.4/apache2/conf.d/00-ioncube.ini
-  sudo apt-get purge '^php7.*' -y
+  # حذف نسخه‌های قدیمی و نصب آخرین نسخه
+  sudo apt-get purge '^php[0-9]\.[0-9].*' -y
   apt remove php* -y
-  apt remove php -y
   apt autoremove -y
-  # نصب PHP 8.1 و ماژول‌های مورد نیاز فقط با تابع install_package
-  install_package php8.1
-  install_package php8.1-mysql
-  install_package php8.1-xml
-install_package php8.1-curl
-install_package php8.1-fpm
-install_package php8.1-cli
-install_package php8.1-common
-install_package php8.1-opcache
-install_package php8.1-mbstring
-install_package php8.1-zip
-install_package php8.1-intl
-install_package php8.1-simplexml
-echo "PHP 8.1 and required modules installed."
+  for pkg in "${php_packages[@]}"; do
+    install_package "$pkg"
+  done
+  echo "PHP $latest_php_version and required modules installed."
 fi
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
     echo "/bin/false" >>/etc/shells
