@@ -275,7 +275,7 @@ wait
 phpv=$(php -v)
 if [[ $phpv == *"8.1"* ]]; then
   apt autoremove -y
-  echo "PHP Is Installed :)"
+  echo "PHP Is Installed :"
 else
   rm -fr /etc/php/7.4/apache2/conf.d/00-ioncube.ini
   sudo apt-get purge '^php7.*' -y
