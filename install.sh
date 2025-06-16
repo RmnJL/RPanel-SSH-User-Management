@@ -365,8 +365,6 @@ EOF
     wait
     echo 'www-data ALL=(ALL:ALL) NOPASSWD:/usr/bin/passwd' | sudo EDITOR='tee -a' visudo &
     wait
-    echo 'www-data ALL=(ALL:ALL) N
-    wait
     echo 'www-data ALL=(ALL:ALL) NOPASSWD:/usr/bin/kill' | sudo EDITOR='tee -a' visudo &
     wait
     echo 'www-data ALL=(ALL:ALL) NOPASSWD:/usr/bin/killall' | sudo EDITOR='tee -a' visudo &
@@ -481,6 +479,8 @@ ENDOFFILE
 server {
     listen 80;
     server_name example.com;
+    root /var/www/html/example;
+    index index.php index
     root /var/www/html/example;
     index index.php index.html;
 
@@ -904,6 +904,37 @@ check_install() {
 
 # TODO: برای افزایش امنیت و پایداری، قبل از نصب هر پکیج، وجود آن بررسی و در صورت نیاز نصب شود. همچنین، مدیریت خطا و لاگ‌گیری بهبود یابد.
 
+# پاک‌سازی نصب قبلی RPanel
+clean_previous_install() {
+  echo -e "\e[33mدر حال بررسی و پاک‌سازی نصب قبلی RPanel...\e[0m"
+  # حذف دیتابیس RPanel_plus در صورت وجود
+  if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
+    mysql -u root -e "DROP DATABASE RPanel_plus;"
+    echo "دیتابیس RPanel_plus حذف شد."
+  fi
+  # حذف فایل‌ها و دایرکتوری‌های اصلی
+  rm -rf /var/www/html/app
+  rm -rf /var/www/html/cp
+  rm -rf /var/www/html/example
+  rm -f /var/www/rpanelport
+  rm -f /var/www/html/.env_copy
+  rm -f /var/www/html/update.zip
+  # حذف سرویس‌های systemd مرتبط
+  for svc in wss wssd videocall; do
+    systemctl stop $svc 2>/dev/null
+    systemctl disable $svc 2>/dev/null
+    rm -f /etc/systemd/system/$svc.service
+  done
+  systemctl daemon-reload
+  # حذف کاربر سیستم videocall
+  id videocall &>/dev/null && userdel -r videocall
+  # حذف ruleهای visudo اضافه شده برای www-data
+  sed -i '/www-data ALL=(ALL:ALL) NOPASSWD:/d' /etc/sudoers
+  echo -e "\e[32mپاک‌سازی نصب قبلی RPanel انجام شد.\e[0m"
+}
+
+# اجرای پاک‌سازی قبل از هر نصب جدید
+clean_previous_install
 checkOS
 configSSH
 setCONFIG
