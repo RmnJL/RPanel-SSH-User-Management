@@ -301,17 +301,17 @@ else
   done
   echo "PHP $latest_php_version and required modules installed."
 fi
-    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-    echo "/bin/false" >>/etc/shells
-    echo "/usr/sbin/nologin" >>/etc/shells
+  curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+  echo "/bin/false" >>/etc/shells
+  echo "/usr/sbin/nologin" >>/etc/shells
 
-    #Banner
-    cat <<EOF >/root/banner.txt
+  #Banner
+  cat <<EOF >/root/banner.txt
 Connect To Server
 EOF
-    #Configuring stunnel
-    sudo mkdir /etc/stunnel
-    cat <<EOF >/etc/stunnel/stunnel.conf
+  #Configuring stunnel
+  sudo mkdir /etc/stunnel
+  cat <<EOF >/etc/stunnel/stunnel.conf
  cert = /etc/stunnel/stunnel.pem
  [openssh]
  accept = $sshtls_port
