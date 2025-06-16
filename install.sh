@@ -677,13 +677,11 @@ END
     systemctl enable stunnel4
     systemctl restart stunnel4
     wait
-  fi
 }
 
 # ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
-    # به‌روزرسانی جداول و admin
     mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
     mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
 else
@@ -698,7 +696,6 @@ if [ -f "/var/www/rpanelport" ]; then
     echo "Updating rpanelport file..."
     rm -f /var/www/rpanelport
 fi
-# ایجاد مجدد فایل rpanelport
 echo '#RPanel' >/var/www/rpanelport
 sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
 wait
