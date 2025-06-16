@@ -444,11 +444,11 @@ EOF
     fi
     udpport=7300
     echo -e "\nPlease input UDPGW Port ."
-    printf "Default Port is \e[33m${udpport}\e[0m, leave it blank to use this Port: "
+    printf "Default Port is \e[33m${udpport}\e[0m, leave it blank to
     read udpport
     sudo bash -c "$(curl -Ls https://raw.githubusercontent.com/RmnJL/Nethogs-Json-main/main/install.sh --ipv4)"
     git clone https://github.com/ambrop72/badvpn.git /root/badvpn
-    mkdir /root/badvpn/badvpn-build
+    mkdir /root/badv
     cd /root/badvpn/badvpn-build
     cmake .. -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1 &
     wait
@@ -684,13 +684,13 @@ END
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
     # به‌روزرسانی جداول و admin
-    mysql -u root -e "USE RPanel_plus; ALTER TABLE admins MODIFY username VARCHAR(255);"
-    mysql -u root -e "USE RPanel_plus; UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+    mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+    mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
 else
     echo "Database RPanel_plus does not exist. Creating..."
     mysql -u root -e "CREATE DATABASE RPanel_plus;"
-    mysql -u root -e "USE RPanel_plus; CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
-    mysql -u root -e "USE RPanel_plus; INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
+    mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
+    mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
 fi
 
 # فایل rpanelport: همیشه overwrite شود
