@@ -699,9 +699,9 @@ if [ -f "/var/www/rpanelport" ]; then
     rm -f /var/www/rpanelport
 fi
 # ایجاد مجدد فایل rpanelport
-    echo '#RPanel' >/var/www/rpanelport
-    sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
-    wait
+echo '#RPanel' >/var/www/rpanelport
+sudo sed -i -e '$a\nRPanelport '$serverPort /var/www/rpanelport
+wait
 }
 moreCONFIG() {
   sed -i "s/PORT_SSH=.*/PORT_SSH=$port/g" /var/www/html/app/.env
