@@ -207,7 +207,14 @@ startINSTALL() {
     sudo apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
     apt-get install -y stunnel4 && apt-get install -y cmake && apt-get install -y screenfetch && apt-get install -y openssl
     sudo apt-get -y install software-properties-common
-    sudo add-apt-repository ppa:ondrej/php -y
+
+    # بررسی اتصال اینترنت قبل از اضافه کردن مخزن PPA
+    if ping -c 1 8.8.8.8 >/dev/null 2>&1; then
+        sudo add-apt-repository ppa:ondrej/php -y
+    else
+        echo -e "\e[31mاتصال اینترنت برقرار نیست یا دسترسی به سرورهای PPA وجود ندارد. نصب متوقف شد.\e[0m"
+        exit 1
+    fi
     sudo apt-get install nginx zip unzip net-tools mariadb-server -y
     sudo apt-get install php php-cli php-mbstring php-dom php-pdo php-mysql -y
     sudo apt-get install npm -y
