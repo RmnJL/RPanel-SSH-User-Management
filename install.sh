@@ -654,7 +654,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 END
 
-    systemctl daemon-reload
+    systemctl daemon-re
     systemctl enable wssd
     systemctl restart wssd
 
@@ -766,9 +766,9 @@ ENDOFFILE
   DEFAULT_STATUS_LOG=deactive
   DEFAULT_BOT_TOKEN=
   DEFAULT_BOT_ID_ADMIN=
-  DEFAULT_BOT_API_ACCESS= 
-  DEFAULT_ANTI
-  DEFAULT_TRAFFIC_SERVER= 
+  DEFAULT_BOT_API_ACCESS=
+  DEFAULT_ANTI=
+  DEFAULT_TRAFFIC_SERVER=
   DEFAULT_BOT_LOG=
   DEFAULT_PORT_UDPGW=
   DEFAULT_MAIL_STATUS=
