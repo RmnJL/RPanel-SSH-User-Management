@@ -679,11 +679,28 @@ END
     wait
 }
 
+# اطمینان از نصب بودن mariadb-client قبل از هر استفاده از mysql
+if ! command -v mysql >/dev/null 2>&1; then
+  echo -e "\e[33mدر حال نصب mariadb-client برای اجرای دستورات mysql...\e[0m"
+  apt-get update && apt-get install -y mariadb-client
+fi
+
+# ایجاد دایرکتوری /var/www در صورت نبود
+if [ ! -d "/var/www" ]; then
+  mkdir -p /var/www
+fi
+
 # ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
-    mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
-    mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+    if mysql -u root RPanel_plus -e "SHOW TABLES LIKE 'admins';" 2>/dev/null | grep -q admins; then
+        mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
+        mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
+    else
+        echo "Table admins does not exist. Creating..."
+        mysql -u root RPanel_plus -e "CREATE TABLE IF NOT EXISTS admins (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), permission VARCHAR(50), credit VARCHAR(50), status VARCHAR(50));"
+        mysql -u root RPanel_plus -e "INSERT INTO admins (username, password, permission, credit, status) VALUES ('${adminusername}', '${adminpassword}', 'admin', '', 'active');"
+    fi
 else
     echo "Database RPanel_plus does not exist. Creating..."
     mysql -u root -e "CREATE DATABASE RPanel_plus;"
@@ -703,7 +720,6 @@ wait
 # ایجاد یا به‌روزرسانی دیتابیس RPanel_plus
 if mysql -u root -e "USE RPanel_plus;" 2>/dev/null; then
     echo "Database RPanel_plus exists. Updating tables and admin..."
-    # به‌روزرسانی جداول و admin
     mysql -u root RPanel_plus -e "ALTER TABLE admins MODIFY username VARCHAR(255);"
     mysql -u root RPanel_plus -e "UPDATE admins SET username = '${adminusername}', password = '${adminpassword}', permission = 'admin', credit = '', status = 'active' WHERE permission = 'admin';"
 else
