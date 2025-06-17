@@ -672,6 +672,7 @@ END
     systemctl restart stunnel4
     wait
 }
+# ======= پایان تابع startINSTALL =======
 
 # اطمینان از نصب بودن mariadb-client قبل از هر استفاده از mysql
 if ! command -v mysql >/dev/null 2>&1; then
